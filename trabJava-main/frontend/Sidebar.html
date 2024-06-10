@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap Sidebar</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.9.0/main.min.css" rel="stylesheet">
+  <style>
+    #wrapper {
+      display: flex;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    #sidebar-wrapper {
+      min-height: 100vh;
+      margin-left: -15rem;
+      transition: margin .25s ease-out;
+    }
+
+    #sidebar-wrapper .list-group {
+      width: 15rem;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+      margin-left: 0;
+    }
+
+    #page-content-wrapper {
+      width: 100%;
+    }
+
+    @media (min-width: 768px) {
+      #sidebar-wrapper {
+        margin-left: 0;
+      }
+    }
+
+    #calendar {
+      margin-left: 20px;
+      width: 70%;
+    }
+
+    .table {
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8f9fa;
+    }
+  </style>
+</head>
+<body>
+  <div class="d-flex" id="wrapper">
+    <!-- Sidebar -->
+    <div class="bg-light border-right" id="sidebar-wrapper">
+      <div class="list-group list-group-flush">
+        <a href="Agendamentos.html" class="list-group-item list-group-item-action bg-light">Agendamentos</a>
+        <a href="AddAgendamento.html" class="list-group-item list-group-item-action bg-light">Adicionar Agendamento</a>
+        <a href="Estoque.html" class="list-group-item list-group-item-action bg-light">Estoque</a>
+        <a href="AddEstoque.html" class="list-group-item list-group-item-action bg-light">Adicionar estoque</a>
+      </div>
+    </div>
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+      <div class="container-fluid">
+        <h1 class="mt-4">Agendamentos</h1>
+        <div id="calendar"></div>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="thead-light">
+              <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Serviço</th>
+              </tr>
+            </thead>
+            <tbody id="agendamentos-body">
+              <!-- Os dados serão inseridos aqui -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.9.0/main.min.js"></script>
+  <script>
+    document.getElementById('wrapper').classList.add('toggled'); // Para mostrar a sidebar por padrão
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth', // Exibir o calendário como um mês
+        events: [
+          {
+            title: 'Evento 1',
+            start: '2022-06-01'
+          },
+          {
+            title: 'Evento 2',
+            start: '2022-06-05',
+            end: '2022-06-07'
+          }
+          // Adicione mais eventos conforme necessário
+        ]
+        // Outras opções de configuração do FullCalendar.js podem ser adicionadas aqui
+      });
+      calendar.render();
+    });
+
+    async function fetchAgendamentos() {
+      try {
+        const response = await fetch('http://localhost:8080/api/agendamentos');
+        const agendamentos = await response.json();
+        const tbody = document.getElementById('agendamentos-body');
+
+        agendamentos.forEach(agendamento => {
+          const tr = document.createElement('tr');
+
+          Object.values(agendamento).forEach(value => {
+            const td = document.createElement('td');
+            td.textContent = value;
+            tr.appendChild(td);
+          });
+
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        console.error('Erro ao buscar agendamentos:', error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchAgendamentos);
+  </script>
+</body>
+</html>
+
+
+

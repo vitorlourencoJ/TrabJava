@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Produto no Estoque</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 50px;
+            max-width: 600px;
+        }
+        .message {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Adicionar Produto no Estoque</h1>
+        <form id="estoque-form">
+            <div class="form-group">
+                <label for="produto">Produto:</label>
+                <input type="text" class="form-control" id="produto" name="produto" required>
+                <datalist id="produtos-lista"></datalist>
+            </div>
+            <div class="form-group">
+                <label for="quantidade">Quantidade:</label>
+                <input type="number" class="form-control" id="quantidade" name="quantidade" required>
+            </div>
+            <div class="form-group">
+                <label for="preco">Preço:</label>
+                <input type="number" step="0.01" class="form-control" id="preco" name="preco" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Adicionar Produto</button>
+            <a href="Sidebar.html" class="btn btn-secondary btn-block mt-3">Home</a>
+        </form>
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        async function fetchProdutos() {
+            try {
+                const response = await fetch('http://localhost:8080/api/estoques');
+                const produtos = await response.json();
+                const produtosLista = document.getElementById('produtos-lista');
+
+                produtos.forEach(produto => {
+                    const option = document.createElement('option');
+                    option.value = produto.produto;
+                    produtosLista.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar produtos:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchProdutos);
+
+        document.getElementById('estoque-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const produto = document.getElementById('produto').value;
+            const quantidade = document.getElementById('quantidade').value;
+            const preco = document.getElementById('preco').value;
+
+            const novoProduto = {
+                produto: produto,
+                quantidade: quantidade,
+                preco: preco
+            };
+
+            try {
+                const response = await fetch('http://localhost:8080/api/estoques', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(novoProduto)
+                });
+
+                if (response.ok) {
+                    document.getElementById('message').innerHTML = '<div class="alert alert-success" role="alert">Produto adicionado com sucesso!</div>';
+                    document.getElementById('estoque-form').reset();
+                } else {
+                    document.getElementById('message').innerHTML = '<div class="alert alert-danger" role="alert">Erro ao adicionar produto.</div>';
+                }
+            } catch (error) {
+                console.error('Erro ao adicionar produto:', error);
+                document.getElementById('message').innerHTML = '<div class="alert alert-danger" role="alert">Erro ao adicionar produto.</div>';
+            }
+        });
+    </script>
+</body>
+</html>
+
+

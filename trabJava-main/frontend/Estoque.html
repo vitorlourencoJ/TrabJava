@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .btn-add {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Estoque</h1>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Produto</th>
+                        <th>Quantidade</th>
+                        <th>Preço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="estoque-body">
+                    <!-- Os dados serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+        <div class="text-center">
+            <a href="AddEstoque.html" class="btn btn-primary btn-add">Adicionar ao Estoque</a>
+            <a href="Sidebar.html" class="btn btn-secondary btn-add">Home</a>
+        </div>
+    </div>
+
+    <script>
+        async function fetchEstoque() {
+            try {
+                const response = await fetch('http://localhost:8080/api/estoques');
+                const estoque = await response.json();
+                const tbody = document.getElementById('estoque-body');
+
+                tbody.innerHTML = ''; // Limpa o conteúdo atual da tabela
+
+                estoque.forEach(item => {
+                    const tr = document.createElement('tr');
+
+                    Object.values(item).forEach(value => {
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        tr.appendChild(td);
+                    });
+
+                    // Adiciona os botões de ação
+                    const tdActions = document.createElement('td');
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Deletar';
+                    deleteButton.className = 'btn btn-danger btn-sm mr-2';
+                    deleteButton.addEventListener('click', () => deleteItem(item.id));
+                    tdActions.appendChild(deleteButton);
+
+                    tr.appendChild(tdActions);
+
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar estoque:', error);
+            }
+        }
+
+        async function deleteItem(itemId) {
+            try {
+                const response = await fetch(`http://localhost:8080/api/estoques/${itemId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    console.log(`Item com ID ${itemId} deletado com sucesso.`);
+                    // Atualizar a visualização do estoque após a exclusão do item
+                    fetchEstoque();
+                } else {
+                    console.error('Erro ao deletar o item:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Erro ao deletar o item:', error);
+            }
+        }
+
+        function editItem(itemId) {
+            // Lógica para editar o item com o ID especificado
+            // Por exemplo, abrir um formulário de edição pré-preenchido com os detalhes atuais do produto
+            console.log('Editar item com ID:', itemId);
+            // Aqui você pode abrir um modal com um formulário de edição
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchEstoque);
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

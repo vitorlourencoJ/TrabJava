@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamentos</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .btn-add {
+            margin-top: 20px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Agendamentos</h1>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Data</th>
+                        <th>Horário</th>
+                        <th>Serviço</th>
+                        <th>Ações</th> <!-- Nova coluna para botões de ação -->
+                    </tr>
+                </thead>
+                <tbody id="agendamentos-body">
+                    <!-- Os dados serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+        <a href="AddAgendamento.html" class="btn btn-primary btn-block btn-add">Adicionar Agendamento</a>
+        <a href="Sidebar.html" class="btn btn-secondary btn-block btn-add">Home</a>
+    </div>
+
+    <script>
+        async function fetchAgendamentos() {
+            try {
+                const response = await fetch('http://localhost:8080/api/agendamentos');
+                const agendamentos = await response.json();
+                const tbody = document.getElementById('agendamentos-body');
+
+                agendamentos.forEach(agendamento => {
+                    const tr = document.createElement('tr');
+
+                    Object.values(agendamento).forEach(value => {
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        tr.appendChild(td);
+                    });
+
+                    // Criando botão de "Deletar" para cada linha da tabela
+                    const tdActions = document.createElement('td');
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Deletar';
+                    deleteButton.className = 'btn btn-danger btn-sm';
+                    deleteButton.addEventListener('click', () => deleteAgendamento(agendamento.id));
+                    tdActions.appendChild(deleteButton);
+                    tr.appendChild(tdActions);
+
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar agendamentos:', error);
+            }
+        }
+
+        async function deleteAgendamento(agendamentoId) {
+    try {
+        const response = await fetch(`http://localhost:8080/api/agendamentos/${agendamentoId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            console.log(`Agendamento com ID ${agendamentoId} deletado com sucesso.`);
+            // Recarrega a página
+            location.reload();
+        } else {
+            console.error('Erro ao deletar o agendamento:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Erro ao deletar o agendamento:', error);
+    }
+}
+
+
+        document.addEventListener('DOMContentLoaded', fetchAgendamentos);
+    </script>
+</body>
+</html>
+
+
+
+
+

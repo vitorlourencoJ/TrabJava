@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Agendamento</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 50px;
+            max-width: 600px;
+        }
+        .message {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Adicionar Agendamento</h1>
+        <form id="agendamento-form">
+            <div class="form-group">
+                <label for="cliente">Cliente:</label>
+                <input type="text" class="form-control" id="cliente" name="cliente" required>
+            </div>
+            <div class="form-group">
+                <label for="data">Data:</label>
+                <input type="date" class="form-control" id="data" name="data" required>
+            </div>
+            <div class="form-group">
+                <label for="horario">Horário:</label>
+                <input type="time" class="form-control" id="horario" name="horario" required>
+            </div>
+            <div class="form-group">
+                <label for="servico">Serviço:</label>
+                <input type="text" class="form-control" id="servico" name="servico" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Adicionar Agendamento</button>
+            <a href="Sidebar.html" class="btn btn-secondary btn-block mt-3">Home</a>
+        </form>
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        document.getElementById('agendamento-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const cliente = document.getElementById('cliente').value;
+            const data = document.getElementById('data').value;
+            const horario = document.getElementById('horario').value;
+            const servico = document.getElementById('servico').value;
+
+            const agendamento = {
+                cliente: cliente,
+                data: data,
+                horario: horario,
+                servico: servico
+            };
+
+            try {
+                const response = await fetch('http://localhost:8080/api/agendamentos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(agendamento)
+                });
+
+                if (response.ok) {
+                    document.getElementById('message').innerHTML = '<div class="alert alert-success" role="alert">Agendamento adicionado com sucesso!</div>';
+                    document.getElementById('agendamento-form').reset();
+                } else {
+                    document.getElementById('message').innerHTML = '<div class="alert alert-danger" role="alert">Erro ao adicionar agendamento.</div>';
+                }
+            } catch (error) {
+                console.error('Erro ao adicionar agendamento:', error);
+                document.getElementById('message').innerHTML = '<div class="alert alert-danger" role="alert">Erro ao adicionar agendamento.</div>';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
